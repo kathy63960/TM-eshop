@@ -1,8 +1,7 @@
 exports.name = 'utils';
-exports.version = '1.02';
+exports.version = '1.03';
 
-var _ = require('lodash'),
-        mongoose = require('mongoose');
+var _ = require('lodash');
 
 
 function round(value, decimals) {
@@ -48,6 +47,3 @@ exports.mergeByObjectId = function (arr1, arr2, prop) {
         arr1obj ? _.extend(arr1obj, arr2obj) : arr1.push(arr2obj);
     });
 };
-
-
-exports.ObjectId = mongoose.Types.ObjectId;

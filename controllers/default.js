@@ -10,8 +10,11 @@ exports.install = function() {
 	F.route('/*', view_page);
 
 	// FILES
-	F.file('/images/small/*.jpg', file_image);
-	F.file('/images/large/*.jpg', file_image);
+        
+	F.file('/images/small/*.jpg', file_image); //OLD
+	F.file('/images/large/*.jpg', file_image); //OLD
+        F.file('/images/s/*', file_image);//small
+        F.file('/images/l/*', file_image);//large
 	F.file('/download/', file_read);
 };
 
@@ -130,42 +133,49 @@ function file_read(req, res) {
 
 // Reads specific picture from database
 // URL: /images/small|large/*.jpg
+
 function file_image(req, res) {
+    // Below method checks if the file exists (processed) in temporary directory
+    // More information in total.js documentation
+    //console.log(req.split);
+    F.exists(req, res, 10, function (next, filename) {
+        var model;
 
-	// Below method checks if the file exists (processed) in temporary directory
-	// More information in total.js documentation
-	F.exists(req, res, 10, function(next, filename) {
+        switch (req.split[2]) {
+            case 'p':
+                model = 'Product';
+                break;
+            case 'c':
+                model = 'Category';
+                break;
+            default :
+                return res.throw404();
+        }
+        
+        DB().readFile(ObjectID.parse(req.split[5]), {bucketName: model}, function(err, fs, close, meta, length) {
+            if (err) {
+                next();
+                return res.throw404();
+            }
 
-		// Reads specific file by ID
-		DB('files').binary.read(req.split[2].replace('.jpg', ''), function(err, stream, header) {
+            fs.stream(true).on('end', function () {
 
-			if (err) {
-				next();
-				return res.throw404();
-			}
+                // Image processing
+                res.image(filename, function (image) {
+                    image.output('jpg');
+                    image.quality(90);
 
-			var writer = require('fs').createWriteStream(filename);
+                    if (req.split[1] === 'l')//large
+                        image.miniature(600, 400);
+                    else
+                        image.miniature(200, 150);
 
-			CLEANUP(writer, function() {
+                    image.minify();
+                });
 
-				// Releases F.exists()
-				next();
-
-				// Image processing
-				res.image(filename, function(image) {
-					image.output('jpg');
-					image.quality(90);
-
-					if (req.split[1] === 'large')
-						image.miniature(500, 300);
-					else
-						image.miniature(200, 150);
-
-					image.minify();
-				});
-			});
-
-			stream.pipe(writer);
-		});
-	});
+                // Releases F.exists()
+                next();
+            }).pipe(require('fs').createWriteStream(filename));
+        });
+    });
 }

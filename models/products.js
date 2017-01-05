@@ -68,7 +68,7 @@ NEWSCHEMA('Product').make(function(schema) {
         var nosql = DB(error);
         nosql.listing('products', 'Product').make(function(builder) {
 
-            builder.where('isremoved', false);
+            builder.where('isremoved', {$ne : true});
             options.category && builder.like('linker_category', '^' + options.category);
             options.manufacturer && builder.where('manufacturer', options.manufacturer);
             //console.log(options.q.keywords(true, true));
@@ -374,8 +374,8 @@ NEWSCHEMA('Product').make(function(schema) {
 	schema.addWorkflow('import.csv', function(error, model, filename, callback) {
 		// Reads all id + references (for updating/inserting)
         var nosql = DB(error);
-        nosql.select('products').make(function(builder) {
-            builder.where('isremoved', false);
+        nosql.select('Product').make(function(builder) {
+            builder.where('isremoved', {$ne : true});
             builder.where('reference', '!=', '');
             builder.fields('id', 'reference');
         });
@@ -448,7 +448,7 @@ NEWSCHEMA('Product').make(function(schema) {
 
         var nosql = DB(error);
         nosql.select('Product').make(function(builder) {
-            builder.where('isremoved', false);
+            builder.where('isremoved', {$ne : true});
             builder.where('reference', '!=', '');
             builder.fields('id', 'reference', 'pictures');
         });
@@ -545,7 +545,7 @@ NEWSCHEMA('Product').make(function(schema) {
     schema.addWorkflow('export.xml', function(error, model, options, callback) {
         var nosql = DB(error);
         nosql.select('products', 'Product').make(function(builder) {
-            builder.where('isremoved', false);
+            builder.where('isremoved', {$ne : true});
 	});
         nosql.exec(function(err, response) {
 
@@ -626,7 +626,8 @@ function refresh() {
 	};
         // filter
         var $match = {};
-        $match.isremoved = false;
+        $match.isremoved = {$ne : true};
+        $match.category = {$exists:true};
         var pipeline = [];
         pipeline.push({
             $match: $match
@@ -648,7 +649,7 @@ function refresh() {
         };
         // filter
         var $match = {};
-        $match.isremoved = false;
+        $match.isremoved = {$ne : true};
         var pipeline = [];
         pipeline.push({
             $match: $match
@@ -672,6 +673,7 @@ function refresh() {
 
         for (var i = 0, length = response.categories.length; i < length; i++) {
             var doc = response.categories[i];
+            console.log(doc);
             db_categories[doc._id.category] = {
                 count: doc.count,
                 linker: doc._id.linker_category,

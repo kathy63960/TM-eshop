@@ -40,11 +40,11 @@
                     <div class="row">
                         <div class="col-md-6 col-sm-6">
                             <div class="product-main-image">
-                                <img src="@{if !model.files || !model.files.length}/img/empty.png@{else}/images/l/p/@{model.linker}/@{model.category.url}/@{model.files[0]._id}/@{model.files[0].originalFilename}.jpg@{fi}" class="img-responsive" alt="@{if !model.files || !model.files.length}@{model.label}@{else}@{model.files[0].description}@{fi}" data-BigImgsrc="@{if !model.files || !model.files.length}/img/empty.png@{else}/images/l/p/@{model.linker}/@{model.category.url}/@{model.files[0]._id}/@{model.files[0].originalFilename}.jpg@{fi}" >
+                                <img src="@{if !model.files || !model.files.length}/img/empty.png@{else}/images/l/p/@{model.linker}/@{model.linker_category}/@{model.files[0]._id}/@{model.files[0].originalFilename}.jpg@{fi}" class="img-responsive" alt="@{if !model.files || !model.files.length}@{model.label}@{else}@{model.files[0].description}@{fi}" data-BigImgsrc="@{if !model.files || !model.files.length}/img/empty.png@{else}/images/l/p/@{model.linker}/@{model.linker_category}/@{model.files[0]._id}/@{model.files[0].originalFilename}.jpg@{fi}" >
                             </div>
                             <div class="product-other-images">
                                 @{foreach m in model.files}
-                                @{if !m.first}<a href="/images/l/p/@{model.linker}/@{model.category.url}/@{m._id}/@{m.originalFilename}.jpg" class="fancybox-button" rel="photos-lib"><img alt="@{m.description}" src="/images/s/p/@{model.linker}/@{model.category.url}/@{m._id}/@{m.originalFilename}.jpg"></a>@{fi}
+                                @{if !m.first}<a href="/images/l/p/@{model.linker}/@{model.linker_category}/@{m._id}/@{m.originalFilename}.jpg" class="fancybox-button" rel="photos-lib"><img alt="@{m.description}" src="/images/s/p/@{model.linker}/@{model.linker_category}/@{m._id}/@{m.originalFilename}.jpg"></a>@{fi}
                                 @{end}
                             </div>
                         </div>
